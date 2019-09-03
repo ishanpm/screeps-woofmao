@@ -4,16 +4,21 @@
 
 module.exports = {
     findEnergySource: function(creep) {
-        let banned = ['bb955e22caa4bf7eb38f38d8']
+        let banned = ['09ff350478094f4408e34d6a']
         
         return creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE, {filter: e => banned.indexOf(e.id) == -1 })
     },
     
     findEnergySink: function(creep) {
-        let minConstruct = Math.random() - 0.25;
+        let minConstruct = Math.random() - 0.5;
         let maxDecay = Math.random();
+        let maxController = Math.random() * 10000;
         
-        let sink = creep.room.find(FIND_STRUCTURES, {filter: e => ((e.my || e instanceof StructureRoad) && (e instanceof StructureController || (e.energy !== undefined && e.energy < e.energyCapacity) || (e.hits / e.hitsMax < maxDecay)))});
+        let sink = creep.room.find(FIND_STRUCTURES, {filter: e => 
+            ((e.my || e instanceof StructureRoad) &&
+            (((e instanceof StructureController) && e.ticksToDowngrade < maxController) ||
+             (e.energy !== undefined && e.energy < e.energyCapacity) ||
+             (e.hits / e.hitsMax < maxDecay)))});
         let construct = creep.room.find(FIND_MY_CONSTRUCTION_SITES, {filter: e => e.progress / e.progressTotal > minConstruct});
         
         sink = sink.concat(construct);
@@ -27,9 +32,19 @@ module.exports = {
         return null;
     },
     findEnergyContainer: function(creep) {
-        return null;
+        let container = creep.pos.findClosestByRange(FIND_STRUCTURES, {filter: e => (e instanceof StructureContainer) && e.store.energy > 0 })
+        let drop = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {filter: e => (e.resourceType == RESOURCE_ENERGY)})
+        
+        if (container && drop) {
+            if (creep.pos.getRangeTo(container.pos) > creep.pos.getRangeTo(drop.pos)) {
+                return drop;
+            }
+        }
+        
+        return container || drop;
     },
-    findEmptyContainer: function(creep) {
-        return null;
+    findVacantContainer: function(creep) {
+        let target = creep.pos.findClosestByRange(FIND_STRUCTURES, {filter: e => (e instanceof StructureContainer) && _.sum(e.store) < e.storeCapacity });
+        return target;
     }
 };
