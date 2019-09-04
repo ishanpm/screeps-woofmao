@@ -6,29 +6,24 @@ var dispatch = require("dispatch")
 var util = require("util")
 var roles = module.exports;
 
-module.exports.fuel = {
-    weight: 1,
-    
-    build: [MOVE, WORK, CARRY, CARRY],
-    
-    action: function(creep) {
-        util.findTarget(creep, "source", "container");
+var emergency = false;
+
+module.exports.harvest = {
+    getBuild: function(maxEnergy) {
+        if (maxEnergy < 550 || emergency) {
+            return [MOVE, WORK, WORK, CARRY];
+        } else {
+            return [MOVE, WORK, WORK, WORK, WORK, CARRY]
+        }
     }
 };
 
-/*
- * Code for each role.
- */
-
-var dispatch = require("dispatch")
-var util = require("util")
-
 module.exports.fuel = {
-    weight: 1,
-    
-    build: [MOVE, WORK, CARRY, CARRY],
-    
-    action: function(creep) {
-        util.findTarget(creep, "container", "sink");
+    getBuild: function (maxEnergy) {
+        if (maxEnergy < 550 || emergency) {
+            return [MOVE, WORK, CARRY, CARRY];
+        } else {
+            return [MOVE, MOVE, WORK, WORK, CARRY, CARRY]
+        }
     }
 };
