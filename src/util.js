@@ -36,6 +36,8 @@ module.exports.findTarget = function(creep, source, sink) {
                 creep.memory.withdraw = false;
                 if (sink == "container")
                     target = dispatch.findVacantContainer(creep)
+                if (sink == "controller")
+                    target = creep.room.controller;
                 if (sink == "sink")
                     target = dispatch.findEnergySink(creep);
             } else {
@@ -69,6 +71,10 @@ module.exports.findTarget = function(creep, source, sink) {
 }
 
 module.exports.moveToTarget = function(creep, target) {
+    //if (creep.room !== target.room) {
+    //    target = creep.room.findExitTo()
+    //}
+    
     if (target) {
         target.room.visual.circle(target.pos, {radius:0.6, fill: 'transparent', stroke: 'rgba(50,200,50,150)', lineStyle: 'dotted'})
         
@@ -82,6 +88,7 @@ module.exports.moveToTarget = function(creep, target) {
         if (status == ERR_NOT_IN_RANGE) {
             creep.moveTo(target, {visualizePathStyle: {}});
         } else if (status != OK) {
+            //console.log(`${creep.name} can't move to ${target} - ${status}`)
             creep.memory.target = null;
         }
     } else {

@@ -4,8 +4,6 @@
 
 module.exports = {
     findEnergySource: function(creep) {
-        let banned = ['09ff350478094f4408e34d6a']
-        
         return creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE, {filter: e => banned.indexOf(e.id) == -1 })
     },
     

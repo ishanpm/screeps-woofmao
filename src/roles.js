@@ -6,27 +6,24 @@ var dispatch = require("dispatch")
 var util = require("util")
 var roles = module.exports;
 
+var emergency = false;
+
 module.exports.harvest = {
-    weight: 0.5,
-    max: 2,
-    
-    build: [MOVE, WORK, WORK, CARRY],
-    //build: [MOVE, WORK, WORK, WORK, WORK, CARRY],
-    
-    action: function(creep) {
-        let target = util.findTarget(creep, "source", "container");
-        util.moveToTarget(creep, target);
+    getBuild: function(maxEnergy) {
+        if (maxEnergy < 550 || emergency) {
+            return [MOVE, WORK, WORK, CARRY];
+        } else {
+            return [MOVE, WORK, WORK, WORK, WORK, CARRY]
+        }
     }
 };
 
 module.exports.fuel = {
-    weight: 1,
-    
-    build: [MOVE, WORK, CARRY, CARRY],
-    //build: [MOVE, MOVE, WORK, WORK, CARRY, CARRY],
-    
-    action: function(creep) {
-        let target = util.findTarget(creep, "container", "sink");
-        util.moveToTarget(creep, target);
+    getBuild: function (maxEnergy) {
+        if (maxEnergy < 550 || emergency) {
+            return [MOVE, WORK, CARRY, CARRY];
+        } else {
+            return [MOVE, MOVE, WORK, WORK, CARRY, CARRY]
+        }
     }
 };

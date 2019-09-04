@@ -1,6 +1,7 @@
 var roles = global.roles = require("roles")
 var jobs = global.jobs = require("jobs")
 var util = global.util = require("util")
+var tower = global.util = require("tower")
 
 // TODO Automatically add jobs for resource collection and distribution
 // createJob('harvest', {target: 'id'})
@@ -50,6 +51,7 @@ module.exports.loop = function() {
             let index = creepRequests.findIndex(e => e[1] == creep.memory.role)
             
             if (index > -1) {
+                console.log(`Assigning ${creep.name} to ${creepRequests[index][0].name}`)
                 creepRequests[index][0].assignCreep(creep);
                 creepRequests.splice(index, 1);
             }
@@ -60,11 +62,12 @@ module.exports.loop = function() {
         let type = util.randomChoice(creepRequests)[1];
         
         let name = type+Game.time;
+        let maxEnergy = Game.spawns['Spawn1'].room.energyCapacityAvailable;
         
-        let status = Game.spawns['Spawn1'].spawnCreep(roles[type].build, name, {memory: {role: type}})
+        let status = Game.spawns['Spawn1'].spawnCreep(roles[type].getBuild(maxEnergy), name, {memory: {role: type}})
         
         if (status == OK)
-            console.log("Creating  "+name);
+            console.log("Creating "+name);
     }
     
     for (let job of jobList) {
@@ -75,13 +78,21 @@ module.exports.loop = function() {
             Memory.jobs.active[job.name] = mem;
         }
         
-        //try {
+        try {
             job.tick();
-        //} catch (e) {console.log(e)}
+        } catch (e) {console.log(`Error in ${job.name} tick: ${e}`)}
         
-        //try {
+        try {
             job.store(mem);
-        //} catch (e) {console.log(e)}
+        } catch (e) {console.log(`Error in ${job.name} store: ${e}`)}
+    }
+    
+    for (let id in Game.structures) {
+        let structure = Game.structures[id];
+        
+        if (structure instanceof StructureTower) {
+            tower.tick(structure);
+        }
     }
     
     /*
