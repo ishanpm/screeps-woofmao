@@ -156,9 +156,9 @@ class CarryJob extends Job {
         super.tick();
         
         for (let creep of this.creeps) {
-            //if (creep.memory.withdraw && creep.pos.getRangeTo(this.pos) > 2) {
-            //    creep.moveTo(this.pos);
-            //} else {
+            if (this.pos && creep.memory.withdraw && creep.pos.getRangeTo(this.pos) > 2) {
+                creep.moveTo(this.pos);
+            } else {
                 let dest = util.findTarget(creep, 'container', 'sink')
                 util.moveToTarget(creep, dest);
                 if (!dest || _.sum(dest.carry) > dest.carryCapacity) {
@@ -166,7 +166,7 @@ class CarryJob extends Job {
                     creep.memory.target = null;
                     creep.memory.withdraw = true;
                 }
-            //}
+            }
         }
     }
 }
