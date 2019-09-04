@@ -52,6 +52,7 @@ class Job {
     }
 }
 
+// Harvest energy from a source and put it in a nearby container (or drop it if none exists)
 class HarvestJob extends Job {
     constructor(mem) {
         super(mem, "harvest");
@@ -129,6 +130,8 @@ class HarvestJob extends Job {
     }
 }
 
+// Carry resources from containers/drops at pos to anywhere that needs energy
+// If pos is null, look for nearest container instead
 class CarryJob extends Job {
     constructor(mem) {
         super(mem, "carry");
@@ -158,6 +161,7 @@ class CarryJob extends Job {
         for (let creep of this.creeps) {
             if (this.pos && creep.memory.withdraw && creep.pos.getRangeTo(this.pos) > 2) {
                 creep.moveTo(this.pos);
+                creep.memory.target = null;
             } else {
                 let dest = util.findTarget(creep, 'container', 'sink')
                 util.moveToTarget(creep, dest);
@@ -171,6 +175,7 @@ class CarryJob extends Job {
     }
 }
 
+// Move energy from containers/drops at src to dest
 class MoveJob extends Job {
     constructor(mem) {
         super(mem, "move");
@@ -203,9 +208,11 @@ class MoveJob extends Job {
             if (creep.memory.withdraw && creep.pos.getRangeTo(this.src) > 1) {
                 creep.say('to source')
                 creep.moveTo(this.src);
+                creep.memory.target = null;
             } else if (!creep.memory.withdraw && creep.pos.getRangeTo(this.dest) > 1) {
                 creep.say('to dest')
                 creep.moveTo(this.dest);
+                creep.memory.target = null;
             } else {
                 let dest = null;
                 
@@ -265,6 +272,7 @@ class UpgradeJob extends Job {
     }
 }
 
+// Sign the controller in given room with message
 class SignJob extends Job {
     constructor(mem) {
         super(mem, "sign");

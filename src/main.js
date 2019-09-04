@@ -35,6 +35,7 @@ module.exports.loop = function() {
         }
     }
     
+    // Assign creeps to jobs
     for (let name in Memory.creeps) {
         let creep = Game.creeps[name];
         
@@ -58,6 +59,7 @@ module.exports.loop = function() {
         }
     }
     
+    // Create new creeps if necessary
     if (creepRequests.length > 0) {
         let type = util.randomChoice(creepRequests)[1];
         
@@ -70,6 +72,7 @@ module.exports.loop = function() {
             console.log("Creating "+name);
     }
     
+    // Run jobs
     for (let job of jobList) {
         let mem = Memory.jobs.active[job.name];
         
@@ -87,6 +90,7 @@ module.exports.loop = function() {
         } catch (e) {console.log(`Error in ${job.name} store: ${e}`)}
     }
     
+    // Run towers
     for (let id in Game.structures) {
         let structure = Game.structures[id];
         
