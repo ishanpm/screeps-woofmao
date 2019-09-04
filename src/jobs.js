@@ -265,7 +265,53 @@ class UpgradeJob extends Job {
     }
 }
 
-var types = {harvest: HarvestJob, carry: CarryJob, upgrade: UpgradeJob, move: MoveJob}
+class SignJob extends Job {
+    constructor(mem) {
+        super(mem, "sign");
+        mem = this.mem;
+        
+        this.room = mem.room;
+        this.message = mem.message;
+        
+        this.updateRequests();
+    }
+    
+    store(mem) {
+        super.store(mem);
+        mem.count = this.count;
+        mem.room = this.room;
+        mem.message = this.message;
+    }
+    
+    assignCreep(creep) {
+        super.assignCreep(creep);
+        
+        this.updateRequests();
+    }
+    
+    updateRequests() {
+        this.requests = {fuel: 1 - this.creeps.length};
+    }
+    
+    tick() {
+        super.tick();
+        
+        for (let creep of this.creeps) {
+            if (Game.rooms[this.room]) {
+                let room = Game.rooms[this.room]
+                creep.moveTo(room.controller);
+                creep.signController(room.controller, this.message);
+                if (room && room.controller && room.controller.sign && room.controller.sign.text == this.message) {
+                    this.finished = true;
+                }
+            }
+        }
+        
+        this.updateRequests();
+    }
+}
+
+var types = {harvest: HarvestJob, carry: CarryJob, upgrade: UpgradeJob, move: MoveJob, sign: SignJob}
 
 function createJob(type, mem) {
     mem = mem || {};
